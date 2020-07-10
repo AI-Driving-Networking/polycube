@@ -27,6 +27,7 @@
 
 #include "BlacklistDstJsonObject.h"
 #include "BlacklistSrcJsonObject.h"
+#include "BlacklistSrcFileJsonObject.h"
 #include "DdosmitigatorJsonObject.h"
 #include "StatsJsonObject.h"
 #include <vector>
@@ -73,6 +74,13 @@ Response ddosmitigator_blacklist_dst_list_by_id_help(const char *name, const Key
 Response ddosmitigator_blacklist_src_list_by_id_help(const char *name, const Key *keys, size_t num_keys);
 Response ddosmitigator_list_by_id_help(const char *name, const Key *keys, size_t num_keys);
 
+Response create_ddosmitigator_blacklist_src_file_by_id_handler(const char *name, const Key *keys, size_t num_keys, const char *value);
+Response delete_ddosmitigator_blacklist_src_file_by_id_handler(const char *name, const Key *keys, size_t num_keys);
+Response read_ddosmitigator_blacklist_src_file_by_id_handler(const char *name, const Key *keys, size_t num_keys);
+Response read_ddosmitigator_blacklist_src_file_file_by_id_handler(const char *name, const Key *keys, size_t num_keys);
+Response replace_ddosmitigator_blacklist_src_file_by_id_handler(const char *name, const Key *keys, size_t num_keys, const char *value);
+Response update_ddosmitigator_blacklist_src_file_by_id_handler(const char *name, const Key *keys, size_t num_keys, const char *value);
+Response update_ddosmitigator_blacklist_src_file_file_by_id_handler(const char *name, const Key *keys, size_t num_keys, const char *value);
 
 #ifdef __cplusplus
 }

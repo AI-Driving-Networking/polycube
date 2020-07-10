@@ -624,6 +624,126 @@ std::vector<nlohmann::fifo_map<std::string, std::string>> read_ddosmitigator_bla
   return r;
 }
 
+/**
+* @brief   Create blacklist-src-file by ID
+*
+* Create operation of resource: blacklist-src-file*
+*
+* @param[in] name ID of name
+* @param[in] value blacklist-src-filebody object
+*
+* Responses:
+*
+*/
+void
+create_ddosmitigator_blacklist_src_file_by_id(const std::string &name, const BlacklistSrcFileJsonObject &value) {
+  auto ddosmitigator = get_cube(name);
+
+  return ddosmitigator->addBlacklistSrcFile(value);
+}
+/**
+* @brief   Delete blacklist-src-file by ID
+*
+* Delete operation of resource: blacklist-src-file*
+*
+* @param[in] name ID of name
+*
+* Responses:
+*
+*/
+void
+delete_ddosmitigator_blacklist_src_file_by_id(const std::string &name) {
+  auto ddosmitigator = get_cube(name);
+
+  return ddosmitigator->delBlacklistSrcFile();
+}
+/**
+* @brief   Read blacklist-src-file by ID
+*
+* Read operation of resource: blacklist-src-file*
+*
+* @param[in] name ID of name
+*
+* Responses:
+* BlacklistSrcFileJsonObject
+*/
+BlacklistSrcFileJsonObject
+read_ddosmitigator_blacklist_src_file_by_id(const std::string &name) {
+  auto ddosmitigator = get_cube(name);
+  return ddosmitigator->getBlacklistSrcFile()->toJsonObject();
+
+}
+
+/**
+* @brief   Read file by ID
+*
+* Read operation of resource: file*
+*
+* @param[in] name ID of name
+*
+* Responses:
+* std::string
+*/
+std::string
+read_ddosmitigator_blacklist_src_file_file_by_id(const std::string &name) {
+  auto ddosmitigator = get_cube(name);
+  auto blacklistSrcFile = ddosmitigator->getBlacklistSrcFile();
+  return blacklistSrcFile->getFile();
+
+}
+/**
+* @brief   Replace blacklist-src-file by ID
+*
+* Replace operation of resource: blacklist-src-file*
+*
+* @param[in] name ID of name
+* @param[in] value blacklist-src-filebody object
+*
+* Responses:
+*
+*/
+void
+replace_ddosmitigator_blacklist_src_file_by_id(const std::string &name, const BlacklistSrcFileJsonObject &value) {
+  auto ddosmitigator = get_cube(name);
+
+  return ddosmitigator->replaceBlacklistSrcFile(value);
+}
+/**
+* @brief   Update blacklist-src-file by ID
+*
+* Update operation of resource: blacklist-src-file*
+*
+* @param[in] name ID of name
+* @param[in] value blacklist-src-filebody object
+*
+* Responses:
+*
+*/
+void
+update_ddosmitigator_blacklist_src_file_by_id(const std::string &name, const BlacklistSrcFileJsonObject &value) {
+  auto ddosmitigator = get_cube(name);
+  auto blacklistSrcFile = ddosmitigator->getBlacklistSrcFile();
+
+  return blacklistSrcFile->update(value);
+}
+
+/**
+* @brief   Update file by ID
+*
+* Update operation of resource: file*
+*
+* @param[in] name ID of name
+* @param[in] value Absolute path of blacklist file
+*
+* Responses:
+*
+*/
+void
+update_ddosmitigator_blacklist_src_file_file_by_id(const std::string &name, const std::string &value) {
+  BlacklistSrcFileJsonObject conf;
+  conf.setFile(value);
+  return create_ddosmitigator_blacklist_src_file_by_id(name, conf);
+}
 
 }
 

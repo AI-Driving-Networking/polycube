@@ -24,6 +24,7 @@
 #include "JsonObjectBase.h"
 
 #include "BlacklistDstJsonObject.h"
+#include "BlacklistSrcFileJsonObject.h"
 #include "StatsJsonObject.h"
 #include "BlacklistSrcJsonObject.h"
 #include <vector>
@@ -77,6 +78,14 @@ public:
   bool blacklistDstIsSet() const;
   void unsetBlacklistDst();
 
+  /// <summary>
+  /// Blacklist file
+  /// </summary>
+  BlacklistSrcFileJsonObject getBlacklistSrcFile() const;
+  void setBlacklistSrcFile(BlacklistSrcFileJsonObject value);
+  bool blacklistSrcFileIsSet() const;
+  void unsetBlacklistSrcFile();
+
 private:
   std::string m_name;
   bool m_nameIsSet;
@@ -86,6 +95,8 @@ private:
   bool m_blacklistSrcIsSet;
   std::vector<BlacklistDstJsonObject> m_blacklistDst;
   bool m_blacklistDstIsSet;
+  BlacklistSrcFileJsonObject m_blacklistSrcFile;
+  bool m_blacklistSrcFileIsSet;
 };
 
 }

@@ -24,6 +24,7 @@
 
 #include "../BlacklistDst.h"
 #include "../BlacklistSrc.h"
+#include "../BlacklistSrcFile.h"
 #include "../Stats.h"
 
 using namespace io::swagger::server::model;
@@ -63,5 +64,13 @@ public:
   virtual void replaceBlacklistDst(const std::string &ip, const BlacklistDstJsonObject &conf) = 0;
   virtual void delBlacklistDst(const std::string &ip) = 0;
   virtual void delBlacklistDstList() = 0;
+
+  /// <summary>
+  /// Blacklist file
+  /// </summary>
+  virtual std::shared_ptr<BlacklistSrcFile> getBlacklistSrcFile() = 0;
+  virtual void addBlacklistSrcFile(const BlacklistSrcFileJsonObject &value) = 0;
+  virtual void replaceBlacklistSrcFile(const BlacklistSrcFileJsonObject &conf) = 0;
+  virtual void delBlacklistSrcFile() = 0;
 };
 

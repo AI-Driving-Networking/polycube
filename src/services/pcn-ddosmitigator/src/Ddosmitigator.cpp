@@ -18,7 +18,7 @@
 #include "Ddosmitigator_dp.h"
 
 #include "polycube/services/utils.h"
-
+#include <fstream>
 using namespace polycube::service;
 
 Ddosmitigator::Ddosmitigator(const std::string name,
@@ -187,7 +187,7 @@ void Ddosmitigator::addBlacklistSrc(const std::string &ip,
       setSrcMatch(true);
       reloadCode();
     }
-
+    
     auto srcblacklist =
         get_percpuhash_table<uint32_t, uint64_t>("srcblacklist");
     srcblacklist.set(utils::ip_string_to_nbo_uint(ip), 0);
@@ -204,6 +204,7 @@ void Ddosmitigator::addBlacklistSrc(const std::string &ip,
 
 void Ddosmitigator::addBlacklistSrcList(
     const std::vector<BlacklistSrcJsonObject> &conf) {
+  logger()->debug("BlacklistSrcList create");
   for (auto &i : conf) {
     std::string ip_ = i.getIp();
     addBlacklistSrc(ip_, i);
@@ -218,9 +219,16 @@ void Ddosmitigator::replaceBlacklistSrc(const std::string &ip,
 }
 
 void Ddosmitigator::delBlacklistSrc(const std::string &ip) {
+  try{
   logger()->debug("BlacklistSrc removeEntry");
 
-  // ebpf map remove is performed in destructor
+  auto srcblacklist =
+        get_percpuhash_table<uint32_t, uint64_t>("srcblacklist");
+    srcblacklist.remove(utils::ip_string_to_nbo_uint(ip));
+  } catch (...) {
+    throw std::runtime_error("unable to del element to map");
+  }
+
   blacklistsrc_.erase(ip);
 
   if (blacklistsrc_.size() == 0) {
@@ -230,9 +238,16 @@ void Ddosmitigator::delBlacklistSrc(const std::string &ip) {
 }
 
 void Ddosmitigator::delBlacklistSrcList() {
+  try{
   logger()->debug("BlacklistSrc remove");
 
-  // ebpf maps remove performed in destructor
+  auto srcblacklist =
+        get_percpuhash_table<uint32_t, uint64_t>("srcblacklist");
+    srcblacklist.remove_all();
+  } catch (...) {
+    throw std::runtime_error("unable to del all elements to map");
+  }
+
   blacklistsrc_.clear();
 
   if (blacklistsrc_.size() == 0) {
@@ -324,6 +339,59 @@ void Ddosmitigator::delBlacklistDstList() {
 
   if (blacklistdst_.size() == 0) {
     setDstMatch(false);
+    reloadCode();
+  }
+}
+
+std::shared_ptr<BlacklistSrcFile> Ddosmitigator::getBlacklistSrcFile() {
+  throw std::runtime_error("Ddosmitigator::getBlacklistSrcFile: Method not implemented");
+}
+
+void Ddosmitigator::addBlacklistSrcFile(const BlacklistSrcFileJsonObject &conf) {
+    logger()->debug("BlacklistSrc create from file");
+    std::string file_ = conf.getFile();
+    BlacklistSrcJsonObject srcConf;
+    std::fstream f;
+    f.open(file_);
+    if(!f.is_open())
+    {
+      logger()->debug("Failed to open blacklist file {0}",file_);
+      return ;
+    }
+    std::string ipstr;
+    while(f.peek()!=EOF){
+      getline(f,ipstr);
+      if(ipstr.empty())
+      {
+        continue;
+      }
+       
+      ipstr.erase(0,ipstr.find_first_not_of(" "));
+      ipstr.erase(ipstr.find_last_not_of(" ") + 1);
+
+      addBlacklistSrc(ipstr, srcConf);
+    }
+
+    f.close();
+    return;
+}
+
+// Basic default implementation, place your extension here (if needed)
+void Ddosmitigator::replaceBlacklistSrcFile(const BlacklistSrcFileJsonObject &conf) {
+
+
+  delBlacklistSrcFile();
+  addBlacklistSrcFile(conf);
+}
+
+void Ddosmitigator::delBlacklistSrcFile() {
+    logger()->debug("BlacklistSrc remove");
+
+  // ebpf maps remove performed in destructor
+  blacklistsrc_.clear();
+
+  if (blacklistsrc_.size() == 0) {
+    setSrcMatch(false);
     reloadCode();
   }
 }

@@ -755,6 +755,125 @@ Response ddosmitigator_list_by_id_help(
   return { kOk, ::strdup(val.dump().c_str()) };
 }
 
+Response create_ddosmitigator_blacklist_src_file_by_id_handler(
+  const char *name, const Key *keys,
+  size_t num_keys ,
+  const char *value) {
+  // Getting the path params
+  std::string unique_name { name };
+
+  try {
+    auto request_body = nlohmann::json::parse(std::string { value });
+    // Getting the body param
+    BlacklistSrcFileJsonObject unique_value { request_body };
+
+    create_ddosmitigator_blacklist_src_file_by_id(unique_name, unique_value);
+    return { kCreated, nullptr };
+  } catch(const std::exception &e) {
+    return { kGenericError, ::strdup(e.what()) };
+  }
+}
+Response delete_ddosmitigator_blacklist_src_file_by_id_handler(
+  const char *name, const Key *keys,
+  size_t num_keys ) {
+  // Getting the path params
+  std::string unique_name { name };
+
+  try {
+    delete_ddosmitigator_blacklist_src_file_by_id(unique_name);
+    return { kOk, nullptr };
+  } catch(const std::exception &e) {
+    return { kGenericError, ::strdup(e.what()) };
+  }
+}
+Response read_ddosmitigator_blacklist_src_file_by_id_handler(
+  const char *name, const Key *keys,
+  size_t num_keys ) {
+  // Getting the path params
+  std::string unique_name { name };
+
+  try {
+
+    auto x = read_ddosmitigator_blacklist_src_file_by_id(unique_name);
+    nlohmann::json response_body;
+    response_body = x.toJson();
+    return { kOk, ::strdup(response_body.dump().c_str()) };
+  } catch(const std::exception &e) {
+    return { kGenericError, ::strdup(e.what()) };
+  }
+}
+
+Response read_ddosmitigator_blacklist_src_file_file_by_id_handler(
+  const char *name, const Key *keys,
+  size_t num_keys ) {
+  // Getting the path params
+  std::string unique_name { name };
+
+  try {
+
+    auto x = read_ddosmitigator_blacklist_src_file_file_by_id(unique_name);
+    nlohmann::json response_body;
+    response_body = x;
+    return { kOk, ::strdup(response_body.dump().c_str()) };
+  } catch(const std::exception &e) {
+    return { kGenericError, ::strdup(e.what()) };
+  }
+}
+Response replace_ddosmitigator_blacklist_src_file_by_id_handler(
+  const char *name, const Key *keys,
+  size_t num_keys ,
+  const char *value) {
+  // Getting the path params
+  std::string unique_name { name };
+
+  try {
+    auto request_body = nlohmann::json::parse(std::string { value });
+    // Getting the body param
+    BlacklistSrcFileJsonObject unique_value { request_body };
+
+    replace_ddosmitigator_blacklist_src_file_by_id(unique_name, unique_value);
+    return { kOk, nullptr };
+  } catch(const std::exception &e) {
+    return { kGenericError, ::strdup(e.what()) };
+  }
+}
+Response update_ddosmitigator_blacklist_src_file_by_id_handler(
+  const char *name, const Key *keys,
+  size_t num_keys ,
+  const char *value) {
+  // Getting the path params
+  std::string unique_name { name };
+
+  try {
+    auto request_body = nlohmann::json::parse(std::string { value });
+    // Getting the body param
+    BlacklistSrcFileJsonObject unique_value { request_body };
+
+    update_ddosmitigator_blacklist_src_file_by_id(unique_name, unique_value);
+    return { kOk, nullptr };
+  } catch(const std::exception &e) {
+    return { kGenericError, ::strdup(e.what()) };
+  }
+}
+
+Response update_ddosmitigator_blacklist_src_file_file_by_id_handler(
+  const char *name, const Key *keys,
+  size_t num_keys ,
+  const char *value) {
+  // Getting the path params
+  std::string unique_name { name };
+
+  try {
+    auto request_body = nlohmann::json::parse(std::string { value });
+    // The conversion is done automatically by the json library
+    std::string unique_value = request_body;
+    update_ddosmitigator_blacklist_src_file_file_by_id(unique_name, unique_value);
+    return { kOk, nullptr };
+  } catch(const std::exception &e) {
+    return { kGenericError, ::strdup(e.what()) };
+  }
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -28,6 +28,8 @@ BlacklistSrc::BlacklistSrc(Ddosmitigator &parent,
 }
 
 BlacklistSrc::~BlacklistSrc() {
+  logger()->debug("BlacklistSrc Destructor. ip {0} ", ip_);
+  #if 0
   auto srcblacklist =
       parent_.get_percpuhash_table<uint32_t, uint64_t>("srcblacklist");
   logger()->debug("BlacklistSrc Destructor. ip {0} ", ip_);
@@ -35,6 +37,7 @@ BlacklistSrc::~BlacklistSrc() {
     srcblacklist.remove(utils::ip_string_to_nbo_uint(ip_));
   } catch (...) {
   }
+#endif
 }
 
 void BlacklistSrc::update(const BlacklistSrcJsonObject &conf) {

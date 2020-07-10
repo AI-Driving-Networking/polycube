@@ -66,4 +66,14 @@ module ddosmitigator {
         description "Dropped Packets";
       }
   }
+
+  container blacklist-src-file {
+      description "Blacklist file";
+
+      leaf file {
+        type string;
+        description "Absolute path of blacklist file";
+        polycube-base:cli-example "/home/test/blacklist";
+      }
+  }
 }

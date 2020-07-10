@@ -27,6 +27,7 @@ DdosmitigatorJsonObject::DdosmitigatorJsonObject() {
   m_statsIsSet = false;
   m_blacklistSrcIsSet = false;
   m_blacklistDstIsSet = false;
+  m_blacklistSrcFileIsSet = false;
 }
 
 DdosmitigatorJsonObject::DdosmitigatorJsonObject(const nlohmann::json &val) :
@@ -35,6 +36,7 @@ DdosmitigatorJsonObject::DdosmitigatorJsonObject(const nlohmann::json &val) :
   m_statsIsSet = false;
   m_blacklistSrcIsSet = false;
   m_blacklistDstIsSet = false;
+  m_blacklistSrcFileIsSet = false;
 
 
   if (val.count("name")) {
@@ -64,6 +66,13 @@ DdosmitigatorJsonObject::DdosmitigatorJsonObject(const nlohmann::json &val) :
     }
 
     m_blacklistDstIsSet = true;
+  }
+
+  if (val.count("blacklist-src-file")) {
+    if (!val["blacklist-src-file"].is_null()) {
+      BlacklistSrcFileJsonObject newItem { val["blacklist-src-file"] };
+      setBlacklistSrcFile(newItem);
+    }
   }
 }
 
@@ -101,6 +110,10 @@ nlohmann::json DdosmitigatorJsonObject::toJson() const {
     if (jsonArray.size() > 0) {
       val["blacklist-dst"] = jsonArray;
     }
+  }
+
+  if (m_blacklistSrcFileIsSet) {
+    val["blacklist-src-file"] = JsonObjectBase::toJson(m_blacklistSrcFile);
   }
 
   return val;
@@ -174,6 +187,22 @@ void DdosmitigatorJsonObject::unsetBlacklistDst() {
   m_blacklistDstIsSet = false;
 }
 
+BlacklistSrcFileJsonObject DdosmitigatorJsonObject::getBlacklistSrcFile() const {
+  return m_blacklistSrcFile;
+}
+
+void DdosmitigatorJsonObject::setBlacklistSrcFile(BlacklistSrcFileJsonObject value) {
+  m_blacklistSrcFile = value;
+  m_blacklistSrcFileIsSet = true;
+}
+
+bool DdosmitigatorJsonObject::blacklistSrcFileIsSet() const {
+  return m_blacklistSrcFileIsSet;
+}
+
+void DdosmitigatorJsonObject::unsetBlacklistSrcFile() {
+  m_blacklistSrcFileIsSet = false;
+}
 
 }
 }

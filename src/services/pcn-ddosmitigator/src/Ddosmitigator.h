@@ -26,6 +26,7 @@
 
 #include "BlacklistDst.h"
 #include "BlacklistSrc.h"
+#include "BlacklistSrcFile.h"
 #include "Stats.h"
 
 using namespace io::swagger::server::model;
@@ -81,6 +82,15 @@ class Ddosmitigator : public polycube::service::TransparentCube,
 
   void replaceAll(std::string &str, const std::string &from,
                   const std::string &to);
+  //void addBlacklistFile();
+
+  /// <summary>
+  /// Blacklist file
+  /// </summary>
+  std::shared_ptr<BlacklistSrcFile> getBlacklistSrcFile() override;
+  void addBlacklistSrcFile(const BlacklistSrcFileJsonObject &value) override;
+  void replaceBlacklistSrcFile(const BlacklistSrcFileJsonObject &conf) override;
+  void delBlacklistSrcFile() override;
 
  public:
   std::string getCode();
