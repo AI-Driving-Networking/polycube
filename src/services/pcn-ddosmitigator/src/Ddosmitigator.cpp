@@ -377,6 +377,15 @@ void Ddosmitigator::addBlacklistSrcFile(const BlacklistSrcFileJsonObject &conf) 
       logger()->debug("Failed to open blacklist file {0}",file_);
       return ;
     }
+
+    if(f.peek()==EOF)
+    {
+       logger()->debug("file {0} is null, clear all blacklist ip",file_);
+       delBlacklistSrcFile();
+       f.close();
+       return ;
+    }
+
     std::string ipstr;
     while(f.peek()!=EOF){
       getline(f,ipstr);
@@ -404,13 +413,7 @@ void Ddosmitigator::replaceBlacklistSrcFile(const BlacklistSrcFileJsonObject &co
 }
 
 void Ddosmitigator::delBlacklistSrcFile() {
-    logger()->debug("BlacklistSrc remove");
+    logger()->debug("BlacklistSrcFile remove");
 
-  // ebpf maps remove performed in destructor
-  blacklistsrc_.clear();
-
-  if (blacklistsrc_.size() == 0) {
-    setSrcMatch(false);
-    reloadCode();
-  }
+  delBlacklistSrcList();
 }
