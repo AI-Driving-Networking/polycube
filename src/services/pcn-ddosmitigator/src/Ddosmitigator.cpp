@@ -192,7 +192,26 @@ void Ddosmitigator::addBlacklistSrc(const std::string &ip,
         get_percpuhash_table<uint32_t, uint64_t>("srcblacklist");
     srcblacklist.set(utils::ip_string_to_nbo_uint(ip), 0);
   } catch (...) {
-    throw std::runtime_error("unable to add element to map");
+    // if table is full
+    if(E2BIG == errno)
+    {
+      // First,remove an random IP which is already existed
+      auto it = blacklistsrc_.begin();
+      std::advance(it,rand()%(blacklistsrc_.size()));
+      std::string ip_ = (*it).first;
+      auto srcblacklist = get_percpuhash_table<uint32_t, uint64_t>("srcblacklist");
+      srcblacklist.remove(utils::ip_string_to_nbo_uint(ip_));
+      blacklistsrc_.erase(ip_);
+      logger()->info("table is full,remove an exsited IP {0}", ip_);
+
+      // add the new IP to the blacklist
+      srcblacklist.set(utils::ip_string_to_nbo_uint(ip), 0);
+      logger()->info("table is full,add new IP {0}", ip);
+    }
+    else
+    {
+      throw std::runtime_error("unable to add element to map");
+    }
   }
 
   BlacklistSrcJsonObject configuration;
