@@ -77,6 +77,11 @@ uint64_t BlacklistDst::getDropPkts() {
 
     logger()->debug("getting dropped packets...");
     logger()->debug("got {0} pkts", pkts);
+
+    if(DdosmitigatorStatsModeEnum::READ_CLEAR == parent_.getStatsMode())
+    {
+      parent_.clearBlacklistDstStats();
+    }
     // TODO: what is this try-catch block for then?
   } catch (...) {
     throw;

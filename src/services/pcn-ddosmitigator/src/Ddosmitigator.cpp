@@ -32,6 +32,8 @@ Ddosmitigator::Ddosmitigator(const std::string name,
   addBlacklistDstList(conf.getBlacklistDst());
 
   addBlacklistSrcList(conf.getBlacklistSrc());
+  addBlacklistSrcFile(conf.getBlacklistSrcFile());
+  setStatsMode(conf.getStatsMode());
 }
 
 Ddosmitigator::~Ddosmitigator() {}
@@ -63,6 +65,10 @@ void Ddosmitigator::update(const DdosmitigatorJsonObject &conf) {
       m->update(i);
     }
   }
+
+  if (conf.statsModeIsSet()) {
+    setStatsMode(conf.getStatsMode());
+  }
 }
 
 DdosmitigatorJsonObject Ddosmitigator::toJsonObject() {
@@ -79,6 +85,7 @@ DdosmitigatorJsonObject Ddosmitigator::toJsonObject() {
     conf.addBlacklistSrc(i->toJsonObject());
   }
 
+  conf.setStatsMode(getStatsMode());
   return conf;
 }
 
@@ -177,6 +184,7 @@ Ddosmitigator::getBlacklistSrcList() {
 void Ddosmitigator::addBlacklistSrc(const std::string &ip,
                                     const BlacklistSrcJsonObject &conf) {
   logger()->debug("BlacklistSrc create");
+  struct blacklist_ipmask key;
 
   try {
     logger()->debug("blacklist size {0} ", blacklistsrc_.size());
@@ -187,10 +195,12 @@ void Ddosmitigator::addBlacklistSrc(const std::string &ip,
       setSrcMatch(true);
       reloadCode();
     }
-    
+
     auto srcblacklist =
-        get_percpuhash_table<uint32_t, uint64_t>("srcblacklist");
-    srcblacklist.set(utils::ip_string_to_nbo_uint(ip), 0);
+        get_percpuhash_table<struct blacklist_ipmask, uint64_t>("srcblacklist");
+    
+    convertIpStringToKey(ip, key);
+    srcblacklist.set(key, 0);
   } catch (...) {
     // if table is full
     if(E2BIG == errno)
@@ -199,13 +209,15 @@ void Ddosmitigator::addBlacklistSrc(const std::string &ip,
       auto it = blacklistsrc_.begin();
       std::advance(it,rand()%(blacklistsrc_.size()));
       std::string ip_ = (*it).first;
-      auto srcblacklist = get_percpuhash_table<uint32_t, uint64_t>("srcblacklist");
-      srcblacklist.remove(utils::ip_string_to_nbo_uint(ip_));
+      auto srcblacklist = get_percpuhash_table<struct blacklist_ipmask, uint64_t>("srcblacklist");
+      convertIpStringToKey(ip_, key);
+      srcblacklist.remove(key);
       blacklistsrc_.erase(ip_);
       logger()->info("table is full,remove an exsited IP {0}", ip_);
 
       // add the new IP to the blacklist
-      srcblacklist.set(utils::ip_string_to_nbo_uint(ip), 0);
+      convertIpStringToKey(ip, key);
+      srcblacklist.set(key, 0);
       logger()->info("table is full,add new IP {0}", ip);
     }
     else
@@ -215,9 +227,14 @@ void Ddosmitigator::addBlacklistSrc(const std::string &ip,
   }
 
   BlacklistSrcJsonObject configuration;
-  configuration.setIp(ip);
+  std::string tmp_ip = ip;
+  if(32 == key.netmask_len)
+  {
+    tmp_ip = utils::get_ip_from_string(ip);
+  }
+  configuration.setIp(tmp_ip);
 
-  blacklistsrc_.emplace(std::piecewise_construct, std::forward_as_tuple(ip),
+  blacklistsrc_.emplace(std::piecewise_construct, std::forward_as_tuple(tmp_ip),
                         std::forward_as_tuple(*this, configuration));
 }
 
@@ -238,17 +255,26 @@ void Ddosmitigator::replaceBlacklistSrc(const std::string &ip,
 }
 
 void Ddosmitigator::delBlacklistSrc(const std::string &ip) {
+  struct blacklist_ipmask key;
   try{
   logger()->debug("BlacklistSrc removeEntry");
 
   auto srcblacklist =
-        get_percpuhash_table<uint32_t, uint64_t>("srcblacklist");
-    srcblacklist.remove(utils::ip_string_to_nbo_uint(ip));
+        get_percpuhash_table<struct blacklist_ipmask, uint64_t>("srcblacklist");
+
+    convertIpStringToKey(ip, key);
+    srcblacklist.remove(key);
   } catch (...) {
     throw std::runtime_error("unable to del element to map");
   }
 
-  blacklistsrc_.erase(ip);
+  std::string tmp_ip = ip;
+  if(32 == key.netmask_len)
+  {
+    tmp_ip = utils::get_ip_from_string(ip);
+  }
+
+  blacklistsrc_.erase(tmp_ip);
 
   if (blacklistsrc_.size() == 0) {
     setSrcMatch(false);
@@ -416,4 +442,53 @@ void Ddosmitigator::delBlacklistSrcFile() {
     logger()->debug("BlacklistSrcFile remove");
 
   delBlacklistSrcList();
+}
+
+DdosmitigatorStatsModeEnum Ddosmitigator::getStatsMode() {
+    return statsMode_;
+}
+
+void Ddosmitigator::setStatsMode(const DdosmitigatorStatsModeEnum &value) {
+    statsMode_ = value;
+}
+
+void Ddosmitigator::clearAllStats() {
+  auto dropcnt = get_percpuarray_table<uint64_t>("dropcnt");
+  dropcnt.set(0,0);
+}
+
+void Ddosmitigator::clearBlacklistSrcStats() {
+  uint32_t key;
+  uint32_t next_key;
+  auto srcblacklist = get_percpuhash_table<uint32_t, uint64_t>("srcblacklist");
+  int ret = srcblacklist.get_first_key(&key);
+  while(!ret){
+    srcblacklist.set(key, 0);
+    ret = srcblacklist.get_next_key(&key, &next_key);
+    key = next_key;
+  }   
+}
+
+void Ddosmitigator::clearBlacklistDstStats() {
+  uint32_t key;
+  uint32_t next_key;
+  auto dstblacklist = get_percpuhash_table<uint32_t, uint64_t>("dstblacklist");
+  int ret = dstblacklist.get_first_key(&key);
+  while(!ret){
+    dstblacklist.set(key, 0);
+    ret = dstblacklist.get_next_key(&key, &next_key);
+    key = next_key;
+  }
+}
+
+void Ddosmitigator::convertIpStringToKey(const std::string &ip, struct blacklist_ipmask &key){
+  key.ip = utils::ip_string_to_nbo_uint(ip);
+  std::string neetmask_str = utils::get_netmask_from_string(ip);
+  key.netmask_len = (neetmask_str.empty())?32:std::stoi(neetmask_str);
+  if(key.netmask_len < 32)
+  {
+    key.ip = ntohl(key.ip);
+    key.ip = (key.ip >> (32-key.netmask_len))<<(32-key.netmask_len);
+    key.ip = ntohl(key.ip);
+  }
 }

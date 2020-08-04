@@ -392,7 +392,6 @@ read_ddosmitigator_stats_pkts_by_id(const std::string &name) {
   auto ddosmitigator = get_cube(name);
   auto stats = ddosmitigator->getStats();
   return stats->getPkts();
-
 }
 
 /**
@@ -410,7 +409,6 @@ read_ddosmitigator_stats_pps_by_id(const std::string &name) {
   auto ddosmitigator = get_cube(name);
   auto stats = ddosmitigator->getStats();
   return stats->getPps();
-
 }
 
 /**
@@ -745,8 +743,43 @@ update_ddosmitigator_blacklist_src_file_file_by_id(const std::string &name, cons
   return create_ddosmitigator_blacklist_src_file_by_id(name, conf);
 }
 
+/**
+* @brief   Read stats-mode by ID
+*
+* Read operation of resource: stats-mode*
+*
+* @param[in] name ID of name
+*
+* Responses:
+* DdosmitigatorStatsModeEnum
+*/
+DdosmitigatorStatsModeEnum
+read_ddosmitigator_stats_mode_by_id(const std::string &name) {
+  auto ddosmitigator = get_cube(name);
+  return ddosmitigator->getStatsMode();
+
 }
 
+/**
+* @brief   Update stats-mode by ID
+*
+* Update operation of resource: stats-mode*
+*
+* @param[in] name ID of name
+* @param[in] value Stats mode, read stats only, or read the stats then clear it
+*
+* Responses:
+*
+*/
+void
+update_ddosmitigator_stats_mode_by_id(const std::string &name, const DdosmitigatorStatsModeEnum &value) {
+  auto ddosmitigator = get_cube(name);
+
+  return ddosmitigator->setStatsMode(value);
+}
+
+
+}
 }
 }
 }

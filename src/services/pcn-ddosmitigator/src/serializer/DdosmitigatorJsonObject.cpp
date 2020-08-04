@@ -28,6 +28,8 @@ DdosmitigatorJsonObject::DdosmitigatorJsonObject() {
   m_blacklistSrcIsSet = false;
   m_blacklistDstIsSet = false;
   m_blacklistSrcFileIsSet = false;
+  m_statsMode = DdosmitigatorStatsModeEnum::READ_ONLY;
+  m_statsModeIsSet = true;
 }
 
 DdosmitigatorJsonObject::DdosmitigatorJsonObject(const nlohmann::json &val) :
@@ -37,7 +39,7 @@ DdosmitigatorJsonObject::DdosmitigatorJsonObject(const nlohmann::json &val) :
   m_blacklistSrcIsSet = false;
   m_blacklistDstIsSet = false;
   m_blacklistSrcFileIsSet = false;
-
+  m_statsModeIsSet = false;
 
   if (val.count("name")) {
     setName(val.at("name").get<std::string>());
@@ -73,6 +75,10 @@ DdosmitigatorJsonObject::DdosmitigatorJsonObject(const nlohmann::json &val) :
       BlacklistSrcFileJsonObject newItem { val["blacklist-src-file"] };
       setBlacklistSrcFile(newItem);
     }
+  }
+
+  if (val.count("stats-mode")) {
+    setStatsMode(string_to_DdosmitigatorStatsModeEnum(val.at("stats-mode").get<std::string>()));
   }
 }
 
@@ -114,6 +120,10 @@ nlohmann::json DdosmitigatorJsonObject::toJson() const {
 
   if (m_blacklistSrcFileIsSet) {
     val["blacklist-src-file"] = JsonObjectBase::toJson(m_blacklistSrcFile);
+  }
+
+  if (m_statsModeIsSet) {
+    val["stats-mode"] = DdosmitigatorStatsModeEnum_to_string(m_statsMode);
   }
 
   return val;
@@ -202,6 +212,42 @@ bool DdosmitigatorJsonObject::blacklistSrcFileIsSet() const {
 
 void DdosmitigatorJsonObject::unsetBlacklistSrcFile() {
   m_blacklistSrcFileIsSet = false;
+}
+
+DdosmitigatorStatsModeEnum DdosmitigatorJsonObject::getStatsMode() const {
+  return m_statsMode;
+}
+
+void DdosmitigatorJsonObject::setStatsMode(DdosmitigatorStatsModeEnum value) {
+  m_statsMode = value;
+  m_statsModeIsSet = true;
+}
+
+bool DdosmitigatorJsonObject::statsModeIsSet() const {
+  return m_statsModeIsSet;
+}
+
+void DdosmitigatorJsonObject::unsetStatsMode() {
+  m_statsModeIsSet = false;
+}
+
+std::string DdosmitigatorJsonObject::DdosmitigatorStatsModeEnum_to_string(const DdosmitigatorStatsModeEnum &value){
+  switch(value) {
+    case DdosmitigatorStatsModeEnum::READ_ONLY:
+      return std::string("read-only");
+    case DdosmitigatorStatsModeEnum::READ_CLEAR:
+      return std::string("read-clear");
+    default:
+      throw std::runtime_error("Bad Ddosmitigator statsMode");
+  }
+}
+
+DdosmitigatorStatsModeEnum DdosmitigatorJsonObject::string_to_DdosmitigatorStatsModeEnum(const std::string &str){
+  if (JsonObjectBase::iequals("read-only", str))
+    return DdosmitigatorStatsModeEnum::READ_ONLY;
+  if (JsonObjectBase::iequals("read-clear", str))
+    return DdosmitigatorStatsModeEnum::READ_CLEAR;
+  throw std::runtime_error("Ddosmitigator statsMode is invalid");
 }
 
 }

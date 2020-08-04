@@ -76,4 +76,13 @@ module ddosmitigator {
         polycube-base:cli-example "/home/test/blacklist";
       }
   }
+
+  leaf stats-mode {
+      type enumeration {
+          enum READ-ONLY;
+          enum READ-CLEAR;
+        }
+      default "READ-ONLY";
+      description "Stats mode, read stats only, or read the stats then clear it";
+    }
 }

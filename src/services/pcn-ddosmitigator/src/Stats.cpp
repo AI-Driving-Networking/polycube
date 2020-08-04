@@ -44,28 +44,37 @@ StatsJsonObject Stats::toJsonObject() {
   return conf;
 }
 
-uint64_t Stats::getPps() {
-  // This method retrieves the pps value.
-  int begin = getPkts();
-  sleep(1);
-  int end = getPkts();
-
-  return end - begin;
-  return 0;
-  // throw std::runtime_error("[Stats]: Method getPps not implemented");
-}
-
-uint64_t Stats::getPkts() {
-  // This method retrieves the pkts value.
+uint64_t Stats::accumulatePkts() {
   uint64_t pkts = 0;
 
   auto dropcnt = parent_.get_percpuarray_table<uint64_t>("dropcnt");
   auto values = dropcnt.get(0);
 
   pkts = std::accumulate(values.begin(), values.end(), pkts);
-
   logger()->debug("getting dropped packets...");
   logger()->debug("got {0} pkts", pkts);
+
+  return pkts; 
+}
+
+uint64_t Stats::getPps() {
+  // This method retrieves the pps value.
+  uint64_t begin = accumulatePkts();
+  sleep(1);
+  uint64_t end = accumulatePkts();
+
+  return end - begin;
+  // throw std::runtime_error("[Stats]: Method getPps not implemented");
+}
+
+uint64_t Stats::getPkts() {
+  // This method retrieves the pkts value.
+  uint64_t pkts = accumulatePkts();
+
+  if(DdosmitigatorStatsModeEnum::READ_CLEAR == parent_.getStatsMode())
+  {
+    parent_.clearAllStats();
+  }
 
   return pkts;
 }

@@ -72,13 +72,19 @@ uint64_t BlacklistSrc::getDropPkts() {
 
   try {
     auto srcblacklist =
-        parent_.get_percpuhash_table<uint32_t, uint64_t>("srcblacklist");
-    auto values = srcblacklist.get(utils::ip_string_to_nbo_uint(ip_));
-
+        parent_.get_percpuhash_table<struct blacklist_ipmask, uint64_t>("srcblacklist");
+    struct blacklist_ipmask key;
+    parent_.convertIpStringToKey(ip_, key);
+    auto values = srcblacklist.get(key);
     pkts = std::accumulate(values.begin(), values.end(), pkts);
 
     logger()->debug("getting dropped packets...");
     logger()->debug("got {0} pkts", pkts);
+
+    if(DdosmitigatorStatsModeEnum::READ_CLEAR == parent_.getStatsMode())
+    {
+      parent_.clearBlacklistSrcStats();
+    }
 
     return pkts;
     // TODO: what is this try-catch block for then?

@@ -25,6 +25,11 @@
 #include <uapi/linux/ip.h>
 #include <uapi/linux/ipv6.h>
 
+struct blacklist_ipmask {
+  uint32_t netmask_len;
+  uint32_t ip;
+};
+
 /*
  * dropcount is used to store dropped pkts counters.
  * key (uint32_t): [0] always stored at same array position
@@ -38,7 +43,7 @@ BPF_TABLE("percpu_array", int, u64, dropcnt, 1);
  * value (u64): used for matched rules counters.
  */
 #if SRC_MATCH
-BPF_TABLE("percpu_hash", uint32_t, u64, srcblacklist, 1024);
+BPF_TABLE("percpu_hash", struct blacklist_ipmask, u64, srcblacklist, 1024);
 // TODO it should be u64 as value
 #endif
 
@@ -68,13 +73,20 @@ static inline int parse_ipv4(void *data, u64 nh_off, void *data_end) {
     return 0;
 
 #if SRC_MATCH
-  uint32_t src = iph->saddr;
-
-  u64 *cntsrc = srcblacklist.lookup(&src);
+struct blacklist_ipmask key;
+int loopNet[] = {32,24,16,8};
+int netLen = sizeof(loopNet)/sizeof(int);
+#pragma unroll
+for (uint8_t i = 0; i < netLen; ++i) {
+  key.netmask_len = loopNet[i];
+  key.ip = ((ntohl(iph->saddr)) >> (32-key.netmask_len)) << (32-key.netmask_len);
+  key.ip = htonl(key.ip);
+  u64 *cntsrc = srcblacklist.lookup(&key);
   if (cntsrc) {
     *cntsrc += 1;
     return iph->protocol;
   }
+}
 
 #endif
 

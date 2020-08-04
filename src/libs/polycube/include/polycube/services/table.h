@@ -247,6 +247,14 @@ class PercpuHashTable : protected RawTable {
     }
   }
 
+  int get_first_key(KeyType *key) {
+    return RawTable::first(key);
+  }
+
+  int get_next_key(const KeyType *key, KeyType *next_key) {
+    return RawTable::next(key, next_key);
+  }
+
   // private:
   explicit PercpuHashTable(void *op) : RawTable(op), ncpus_(get_possible_cpu_count()){};
   unsigned int ncpus_;

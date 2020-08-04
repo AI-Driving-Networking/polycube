@@ -31,6 +31,11 @@
 
 using namespace io::swagger::server::model;
 
+struct blacklist_ipmask {
+  uint32_t netmask_len;
+  uint32_t ip;
+};
+
 class Ddosmitigator : public polycube::service::TransparentCube,
                       public DdosmitigatorInterface {
  public:
@@ -92,6 +97,17 @@ class Ddosmitigator : public polycube::service::TransparentCube,
   void replaceBlacklistSrcFile(const BlacklistSrcFileJsonObject &conf) override;
   void delBlacklistSrcFile() override;
 
+  /// <summary>
+  /// Stats mode, read stats only, or read the stats then clear it
+  /// </summary>
+  DdosmitigatorStatsModeEnum getStatsMode() override;
+  void setStatsMode(const DdosmitigatorStatsModeEnum &value) override;
+
+  void clearAllStats();
+  void clearBlacklistDstStats();
+  void clearBlacklistSrcStats();
+
+  void convertIpStringToKey(const std::string &ip, struct blacklist_ipmask &key);
  public:
   std::string getCode();
   bool reloadCode();
@@ -101,7 +117,7 @@ class Ddosmitigator : public polycube::service::TransparentCube,
 
   bool src_match_ = false;
   bool dst_match_ = false;
-
+  DdosmitigatorStatsModeEnum statsMode_ = DdosmitigatorStatsModeEnum::READ_ONLY;
  private:
   // when code is reloaded it will be set to false
   bool is_code_changed_ = false;

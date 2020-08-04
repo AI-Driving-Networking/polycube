@@ -35,6 +35,9 @@ namespace swagger {
 namespace server {
 namespace model {
 
+enum class DdosmitigatorStatsModeEnum {
+  READ_ONLY, READ_CLEAR
+};
 
 /// <summary>
 ///
@@ -86,6 +89,17 @@ public:
   bool blacklistSrcFileIsSet() const;
   void unsetBlacklistSrcFile();
 
+  /// <summary>
+  /// Stats mode, read stats only, or read the stats then clear it
+  /// </summary>
+  DdosmitigatorStatsModeEnum getStatsMode() const;
+  void setStatsMode(DdosmitigatorStatsModeEnum value);
+  bool statsModeIsSet() const;
+  void unsetStatsMode();
+  static std::string DdosmitigatorStatsModeEnum_to_string(const DdosmitigatorStatsModeEnum &value);
+  static DdosmitigatorStatsModeEnum string_to_DdosmitigatorStatsModeEnum(const std::string &str);
+
+
 private:
   std::string m_name;
   bool m_nameIsSet;
@@ -97,6 +111,8 @@ private:
   bool m_blacklistDstIsSet;
   BlacklistSrcFileJsonObject m_blacklistSrcFile;
   bool m_blacklistSrcFileIsSet;
+  DdosmitigatorStatsModeEnum m_statsMode;
+  bool m_statsModeIsSet;
 };
 
 }

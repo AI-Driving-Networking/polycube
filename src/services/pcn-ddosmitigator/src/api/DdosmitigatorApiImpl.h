@@ -82,6 +82,9 @@ namespace DdosmitigatorApiImpl {
   void update_ddosmitigator_blacklist_src_file_by_id(const std::string &name, const BlacklistSrcFileJsonObject &value);
   void update_ddosmitigator_blacklist_src_file_file_by_id(const std::string &name, const std::string &value);
   
+  DdosmitigatorStatsModeEnum read_ddosmitigator_stats_mode_by_id(const std::string &name);
+  void update_ddosmitigator_stats_mode_by_id(const std::string &name, const DdosmitigatorStatsModeEnum &value);
+
   /* help related */
   std::vector<nlohmann::fifo_map<std::string, std::string>> read_ddosmitigator_blacklist_dst_list_by_id_get_list(const std::string &name);
   std::vector<nlohmann::fifo_map<std::string, std::string>> read_ddosmitigator_blacklist_src_list_by_id_get_list(const std::string &name);

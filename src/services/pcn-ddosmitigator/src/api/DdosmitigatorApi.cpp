@@ -872,6 +872,42 @@ Response update_ddosmitigator_blacklist_src_file_file_by_id_handler(
   } catch(const std::exception &e) {
     return { kGenericError, ::strdup(e.what()) };
   }
+
+
+}
+
+Response read_ddosmitigator_stats_mode_by_id_handler(
+  const char *name, const Key *keys,
+  size_t num_keys ) {
+  // Getting the path params
+  std::string unique_name { name };
+
+  try {
+
+    auto x = read_ddosmitigator_stats_mode_by_id(unique_name);
+    nlohmann::json response_body;
+    response_body = DdosmitigatorJsonObject::DdosmitigatorStatsModeEnum_to_string(x);
+    return { kOk, ::strdup(response_body.dump().c_str()) };
+  } catch(const std::exception &e) {
+    return { kGenericError, ::strdup(e.what()) };
+  }
+}
+
+Response update_ddosmitigator_stats_mode_by_id_handler(
+  const char *name, const Key *keys,
+  size_t num_keys ,
+  const char *value) {
+  // Getting the path params
+  std::string unique_name { name };
+
+  try {
+    auto request_body = nlohmann::json::parse(std::string { value });
+    DdosmitigatorStatsModeEnum unique_value_ = DdosmitigatorJsonObject::string_to_DdosmitigatorStatsModeEnum(request_body);
+    update_ddosmitigator_stats_mode_by_id(unique_name, unique_value_);
+    return { kOk, nullptr };
+  } catch(const std::exception &e) {
+    return { kGenericError, ::strdup(e.what()) };
+  }
 }
 
 #ifdef __cplusplus

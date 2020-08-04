@@ -45,6 +45,8 @@ class Stats : public StatsInterface {
   /// </summary>
   uint64_t getPkts() override;
 
+  uint64_t accumulatePkts();
+  
  private:
   Ddosmitigator &parent_;
 };

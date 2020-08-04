@@ -72,5 +72,11 @@ public:
   virtual void addBlacklistSrcFile(const BlacklistSrcFileJsonObject &value) = 0;
   virtual void replaceBlacklistSrcFile(const BlacklistSrcFileJsonObject &conf) = 0;
   virtual void delBlacklistSrcFile() = 0;
+
+  /// <summary>
+  /// Stats mode, read stats only, or read the stats then clear it
+  /// </summary>
+  virtual DdosmitigatorStatsModeEnum getStatsMode() = 0;
+  virtual void setStatsMode(const DdosmitigatorStatsModeEnum &value) = 0;
 };
 
