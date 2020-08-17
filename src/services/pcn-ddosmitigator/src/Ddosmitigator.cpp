@@ -185,6 +185,7 @@ void Ddosmitigator::addBlacklistSrc(const std::string &ip,
                                     const BlacklistSrcJsonObject &conf) {
   logger()->debug("BlacklistSrc create");
   struct blacklist_ipmask key;
+  utils::ip_and_prefix_is_valid(ip);
 
   try {
     logger()->debug("blacklist size {0} ", blacklistsrc_.size());
@@ -325,7 +326,7 @@ Ddosmitigator::getBlacklistDstList() {
 void Ddosmitigator::addBlacklistDst(const std::string &ip,
                                     const BlacklistDstJsonObject &conf) {
   logger()->debug("BlacklistDst create");
-
+  utils::ip_and_prefix_is_valid(ip);
   try {
     // TODO check if dst ip rules are already present
     // and reinject datapath with dstblacklist ps

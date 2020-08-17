@@ -293,6 +293,22 @@ void split_ip_and_prefix(const std::string &ip_and_prefix,
   netmask = get_netmask_from_prefixlength(std::atoi(info[1].c_str()));
 }
 
+bool ip_and_prefix_is_valid(const std::string &ip_and_prefix) {
+  // ip_and_prefix = ip_address/prefix
+  std::istringstream split(get_ip_from_string(ip_and_prefix));
+  std::string prefix = get_netmask_from_string(ip_and_prefix);
+  char split_char = '.';
+  for (std::string each; std::getline(split, each, split_char);) {
+    if(std::atoi(each.c_str()) > 255) {
+      throw std::runtime_error("IP Address is invalid");
+    }
+  }
+  if(std::atoi(prefix.c_str()) > 32) {
+    throw std::runtime_error("Prefix is invalid");
+  }
+  return true;
+}
+
 }  // namespace utils
 }  // namespace service
 }  // namespace polycube

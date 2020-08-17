@@ -83,6 +83,8 @@ void split_ip_and_prefix(const std::string &ip_and_prefix,
  */
 std::string format_debug_string(std::string str, const uint64_t args[4]);
 
+/* check ip and prefix valid or not*/
+bool ip_and_prefix_is_valid(const std::string &ip_and_prefix);
 }  // namespace utils
 }  // namespace service
 }  // namespace polycube
