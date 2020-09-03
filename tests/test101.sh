@@ -2,6 +2,7 @@
 
 # delete a cube with one port
 
+
 function cleanup {
   set +e
   polycubectl del helloworld hw0
